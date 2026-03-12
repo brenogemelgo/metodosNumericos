@@ -55,7 +55,8 @@ while Epest > Eppara:
 
 # plots
 plt.figure()
-plt.plot(contador, estimativa, "or", label="$\mathrm{e}^x$")
+plt.plot(contador, estimativa, "or", label="estimativa")
+plt.axhline(y=u, linestyle="--", label="$\mathrm{e}$")
 plt.legend()
 plt.xlabel("Número de termos")
 plt.ylabel("Estimativa")
