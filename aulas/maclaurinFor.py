@@ -2,9 +2,6 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-# limpa o console antes da execução
-os.system("cls" if os.name == "nt" else "clear")
-
 # e^x
 x = 1
 
