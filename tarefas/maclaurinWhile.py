@@ -26,8 +26,8 @@ EPEST = [100]
 
 
 # série de Maclaurin
-def Maclaurin(x, n):
-    return x**n / math.factorial(n)
+def Maclaurin(x, k):
+    return x**k / math.factorial(k)
 
 
 # loop principal
