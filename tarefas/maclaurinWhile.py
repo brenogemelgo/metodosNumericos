@@ -17,11 +17,12 @@ Eppara = 0.5 * 10 ** (2 - n)
 # definição de valores
 soma = 0
 old = 0
+Ept = 100
 Epest = 100
 i = 0
 estimativa = []
 contador = []
-EPT = []
+EPT = [100]
 EPEST = [100]
 
 
@@ -31,7 +32,7 @@ def Maclaurin(x, k):
 
 
 # loop principal
-while Epest > Eppara:
+while Epest > Eppara and Ept > Eppara:
 
     # somatório
     soma = soma + Maclaurin(x, i)
