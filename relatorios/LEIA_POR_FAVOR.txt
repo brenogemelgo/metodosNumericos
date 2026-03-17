@@ -1,0 +1,3 @@
+Essa pasta (metodosNumericos/relatorios/) é para produção de resultados para os relatórios. 
+Por esse motivo, os códigos estarão um pouco diferentes, usando algumas coisas um pouco menos abstraídas.
+Resumindo, é só uma caixa de ferramentas para o Breno fazer gráficos bonitinhos e extrair outras métricas.
