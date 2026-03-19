@@ -36,7 +36,7 @@ def MaclaurinGaussiana(x, k):
 while Epest > Eppara:
 
     # somatório
-    soma = soma + MaclaurinGaussiana(x, i)
+    soma += MaclaurinGaussiana(x, i)
 
     # erros percentuais
     Ept = abs((u - soma) / u) * 100

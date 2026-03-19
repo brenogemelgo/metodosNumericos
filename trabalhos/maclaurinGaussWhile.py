@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# ============================================== FUNÇÕES ============================================== #
+# ============================================== TERMOS: EXPLÍCITO E RECURSIVO ============================================== #
 
 
 # termo explícito da série
@@ -45,7 +45,10 @@ def estimarGaussianaRecursiva(x, n):
         soma += termo
 
         Ept = abs((u - soma) / u) * 100
-        Epest = abs((soma - old) / soma) * 100 if soma != 0 else 100
+        if soma != 0:
+            Epest = abs((soma - old) / soma) * 100
+        else:
+            Epest = 100
 
         old = soma
 
@@ -75,8 +78,13 @@ def estimarGaussianaExplicita(x, n):
         termo = termoMaclaurinExplicito(x, i)
         soma += termo
 
-        Epest = abs((soma - old) / soma) * 100 if soma != 0 else 100
+        if soma != 0:
+            Epest = abs((soma - old) / soma) * 100
+        else:
+            Epest = 100
+
         old = soma
+
         i += 1
 
     return soma
@@ -88,6 +96,7 @@ def estimarGaussianaExplicita(x, n):
 def tabelaConvergencia(contador, estimativa, EPT, EPEST):
 
     print("\nTabela de convergência")
+    print(f"Valor real = {u:.16f}")
     print("k\tEstimativa\t\tEpt(%)\t\tEpest(%)")
 
     for k, s, ept, epest in zip(contador, estimativa, EPT, EPEST):
@@ -141,7 +150,7 @@ for x in valores_x:
     # tabela
     tabelaConvergencia(contador, estimativa, EPT, EPEST)
 
-    # dumps para tikz
+    # dumps para plotar no tikz
     exportarEstimativa(contador, estimativa, f"estimativa_x{x}.dat")
     exportarErros(contador, EPT, EPEST, f"erros_x{x}.dat")
 
