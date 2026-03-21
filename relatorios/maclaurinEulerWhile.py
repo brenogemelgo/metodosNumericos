@@ -10,7 +10,7 @@ def termoSerie(k):
     return 1 / (k**4)
 
 
-# rotina principal
+# função principal
 def estimarSerie(n):
 
     u = (math.pi**4) / 90
