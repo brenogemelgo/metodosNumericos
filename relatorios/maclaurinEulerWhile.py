@@ -1,6 +1,7 @@
 import math
 import time
-import numpy as np
+import os
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
@@ -22,10 +23,7 @@ def estimarSerie(n):
     Epest = 100
     i = 1
 
-    estimativa = []
-    contador = []
-    EPT = []
-    EPEST = []
+    registros = []
 
     while Ept > Eppara:
 
@@ -39,67 +37,89 @@ def estimarSerie(n):
 
         old = soma
 
-        estimativa.append(soma)
-        contador.append(i)
-        EPT.append(Ept)
-        EPEST.append(Epest)
+        registros.append(
+            {
+                "k": i,
+                "Estimativa": soma,
+                "Ept(%)": Ept,
+                "Epest(%)": Epest,
+            }
+        )
 
         i += 1
 
-    return contador, estimativa, EPT, EPEST, u
+    df = pd.DataFrame(registros)
+
+    return df, u
 
 
 # ============================================== TABELA ============================================== #
 
 
-def tabelaConvergencia(contador, estimativa, EPT, EPEST):
+def tabelaConvergencia(df):
 
     print("\nTabela de convergência")
-    print("i\tEstimativa\t\tEpt(%)\t\tEpest(%)")
 
-    for i, s, ept, epest in zip(contador, estimativa, EPT, EPEST):
-        print(f"{i}\t{s:.10f}\t{ept:.6e}\t{epest:.6e}")
+    print(
+        df.to_string(
+            index=False,
+            formatters={
+                "k": "{:d}".format,
+                "Estimativa": "{:.10f}".format,
+                "Ept(%)": "{:.6e}".format,
+                "Epest(%)": "{:.6e}".format,
+            },
+        )
+    )
 
 
 # ============================================== EXPORTAÇÃO DAT ============================================== #
 
 
-def exportarEstimativa(contador, estimativa, nome):
+def exportarEstimativa(df, pasta, nome):
 
-    with open(nome, "w") as f:
-        for i, s in zip(contador, estimativa):
-            f.write(f"{i} {s}\n")
+    caminho = os.path.join(pasta, nome)
+    df[["k", "Estimativa"]].to_csv(caminho, sep=" ", index=False, header=False)
 
 
-def exportarErros(contador, EPT, EPEST, nome):
+def exportarErros(df, pasta, nome):
 
-    with open(nome, "w") as f:
-        for i, ept, epest in zip(contador, EPT, EPEST):
-            f.write(f"{i} {ept} {epest}\n")
+    caminho = os.path.join(pasta, nome)
+    df[["k", "Ept(%)", "Epest(%)"]].to_csv(caminho, sep=" ", index=False, header=False)
 
 
 # ============================================== PROGRAMA PRINCIPAL ============================================== #
 
 n = 6
 
-t0 = time.perf_counter()
-contador, estimativa, EPT, EPEST, u = estimarSerie(n)
-t1 = time.perf_counter()
+# garante que a pasta existe
+base_dir = os.path.dirname(os.path.abspath(__file__))
+pasta_output = os.path.join(base_dir, "output", "series")
+os.makedirs(pasta_output, exist_ok=True)
 
+t0 = time.perf_counter()
+df, u = estimarSerie(n)
+t1 = time.perf_counter()
 tempo_exp = t1 - t0
 
 # tabela
-tabelaConvergencia(contador, estimativa, EPT, EPEST)
+tabelaConvergencia(df)
 
 # dumps para plotar no tikz
-exportarEstimativa(contador, estimativa, "estimativa_q2.dat")
-exportarErros(contador, EPT, EPEST, "erros_q2.dat")
+exportarEstimativa(df, pasta_output, "estimativa_q2.dat")
+exportarErros(df, pasta_output, "erros_q2.dat")
+
+# colunas para plot
+contador = df["k"]
+estimativa = df["Estimativa"]
+EPT = df["Ept(%)"]
+EPEST = df["Epest(%)"]
 
 # resultado final
 print("\nResultado final")
 print(f"Valor exato        : {u:.10f}")
-print(f"Última estimativa  : {estimativa[-1]:.10f}")
-print(f"Número de termos   : {contador[-1]}")
+print(f"Última estimativa  : {estimativa.iloc[-1]:.10f}")
+print(f"Número de termos   : {int(contador.iloc[-1])}")
 
 # tempo
 print("\nTempo de execução")
@@ -112,18 +132,19 @@ fig, axs = plt.subplots(2, 1, figsize=(6, 8))
 # estimativa
 axs[0].plot(contador, estimativa, "or", label="estimativa")
 axs[0].axhline(y=u, linestyle="--", label=r"$\pi^4/90$")
-axs[0].set_title("Aproximação da série $\sum 1/i^4$")
+axs[0].set_title("Aproximação da série $\sum_{k=1}^n 1/k^4$")
 axs[0].set_xlabel("Número de termos")
 axs[0].set_ylabel("Estimativa")
 axs[0].legend()
 axs[0].grid()
 
 # erros
-axs[1].plot(contador, EPT, "og", label=r"$E_{pt}$")
-axs[1].plot(contador, EPEST, "ob", label=r"$E_{pest}$")
-axs[1].set_title("Erros da série $\sum 1/i^4$")
+axs[1].plot(contador, EPT, "og", label="$E_{\\text{pt}}$")
+axs[1].plot(contador, EPEST, "ob", label="$E_{\\text{epest}}$")
+axs[1].set_title("Erros da série $\sum_{k=1}^n 1/k^4$")
 axs[1].set_xlabel("Número de termos")
 axs[1].set_ylabel("Erro (%)")
+axs[1].set_yscale("log")
 axs[1].legend()
 axs[1].grid()
 

@@ -60,19 +60,18 @@ while Epest > Eppara:
 # plots
 plt.figure()
 plt.plot(contador, estimativa, "or", label="estimativa")
-plt.axhline(y=u, linestyle="--", label="$e^{-x^2}$")
+plt.axhline(y=u, linestyle="--", label="$\mathrm{e}^{-x^2}$")
 plt.legend()
 plt.xlabel("Número de termos")
 plt.ylabel("Estimativa")
 plt.grid()
 
 plt.figure()
-plt.plot(contador, EPT, "og", label="$E_{pt}$")
-plt.plot(contador, EPEST, "ob", label="$E_{pest}$")
+plt.plot(contador, EPT, "og", label="$E_{\\text{pt}}$")
+plt.plot(contador, EPEST, "ob", label="$E_{\\text{pest}}$")
 plt.legend()
 plt.xlabel("Número de termos")
 plt.ylabel("Erros")
 plt.grid()
 
-# não precisa fazer isso no spyder. estou usando vscode então preciso
 plt.show()

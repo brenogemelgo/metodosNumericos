@@ -1,18 +1,20 @@
 import math
 import time
+import os
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
 # ============================================== TERMOS: EXPLÍCITO E RECURSIVO ============================================== #
 
 
-# termo explícito da série
+# termo geral explícito
 def termoMaclaurinExplicito(x, k):
     return ((-1) ** k) * x ** (2 * k) / math.factorial(k)
 
 
-# relação recursiva da série
+# termo geral em forma relação recursiva
 def termoMaclaurinGaussiana(x, k, termoAnterior):
     return termoAnterior * (-(x**2)) / k
 
@@ -32,10 +34,14 @@ def estimarGaussianaRecursiva(x, n):
     Epest = 100
     i = 0
 
-    estimativa = [soma]
-    contador = [0]
-    EPT = [abs((u - soma) / u) * 100]
-    EPEST = [np.inf]
+    registros = [
+        {
+            "k": 0,
+            "Estimativa": soma,
+            "Ept(%)": abs((u - soma) / u) * 100,
+            "Epest(%)": np.inf,
+        }
+    ]
 
     while Epest > Eppara:
 
@@ -52,12 +58,11 @@ def estimarGaussianaRecursiva(x, n):
 
         old = soma
 
-        estimativa.append(soma)
-        contador.append(i)
-        EPT.append(Ept)
-        EPEST.append(Epest)
+        registros.append({"k": i, "Estimativa": soma, "Ept(%)": Ept, "Epest(%)": Epest})
 
-    return contador, estimativa, EPT, EPEST, u
+    df = pd.DataFrame(registros)
+
+    return df, u
 
 
 # ============================================== MÉTODO EXPLÍCITO ============================================== #
@@ -93,31 +98,37 @@ def estimarGaussianaExplicita(x, n):
 # ============================================== TABELA ============================================== #
 
 
-def tabelaConvergencia(contador, estimativa, EPT, EPEST):
+def tabelaConvergencia(df, u):
 
+    print(f"\nValor real = {u:.16f}")
     print("\nTabela de convergência")
-    print(f"Valor real = {u:.16f}")
-    print("k\tEstimativa\t\tEpt(%)\t\tEpest(%)")
 
-    for k, s, ept, epest in zip(contador, estimativa, EPT, EPEST):
-        print(f"{k}\t{s:.10f}\t{ept:.6e}\t{epest:.6e}")
+    print(
+        df.copy().to_string(
+            index=False,
+            formatters={
+                "k": "{:d}".format,
+                "Estimativa": "{:.10f}".format,
+                "Ept(%)": "{:.6e}".format,
+                "Epest(%)": lambda v: "inf" if np.isinf(v) else f"{v:.6e}",
+            },
+        )
+    )
 
 
 # ============================================== EXPORTAÇÃO DAT ============================================== #
 
 
-def exportarEstimativa(contador, estimativa, nome):
+def exportarEstimativa(df, pasta, nome):
 
-    with open(nome, "w") as f:
-        for k, s in zip(contador, estimativa):
-            f.write(f"{k} {s}\n")
+    caminho = os.path.join(pasta, nome)
+    df[["k", "Estimativa"]].to_csv(caminho, sep=" ", index=False, header=False)
 
 
-def exportarErros(contador, EPT, EPEST, nome):
+def exportarErros(df, pasta, nome):
 
-    with open(nome, "w") as f:
-        for k, ept, epest in zip(contador, EPT, EPEST):
-            f.write(f"{k} {ept} {epest}\n")
+    caminho = os.path.join(pasta, nome)
+    df[["k", "Ept(%)", "Epest(%)"]].to_csv(caminho, sep=" ", index=False, header=False)
 
 
 # ============================================== PROGRAMA PRINCIPAL ============================================== #
@@ -126,6 +137,10 @@ valores_x = [1, 2]
 
 n = 6
 
+# garante que a pasta existe
+base_dir = os.path.dirname(os.path.abspath(__file__))
+pasta_output = os.path.join(base_dir, "output", "series")
+os.makedirs(pasta_output, exist_ok=True)
 
 for x in valores_x:
 
@@ -135,29 +150,33 @@ for x in valores_x:
 
     # recursivo
     t0 = time.perf_counter()
-    contador, estimativa, EPT, EPEST, u = estimarGaussianaRecursiva(x, n)
+    df, u = estimarGaussianaRecursiva(x, n)
     t1 = time.perf_counter()
-
     tempo_rec = t1 - t0
 
     # explícito
     t0 = time.perf_counter()
     estimarGaussianaExplicita(x, n)
     t1 = time.perf_counter()
-
     tempo_exp = t1 - t0
 
     # tabela
-    tabelaConvergencia(contador, estimativa, EPT, EPEST)
+    tabelaConvergencia(df, u)
 
     # dumps para plotar no tikz
-    exportarEstimativa(contador, estimativa, f"estimativa_x{x}.dat")
-    exportarErros(contador, EPT, EPEST, f"erros_x{x}.dat")
+    exportarEstimativa(df, pasta_output, f"estimativa_x{x}.dat")
+    exportarErros(df, pasta_output, f"erros_x{x}.dat")
 
     # tempos
     print("\nTempos de execução")
     print(f"Explícito : {tempo_exp:.6e} s")
     print(f"Recursivo : {tempo_rec:.6e} s")
+
+    # colunas para plot
+    contador = df["k"]
+    estimativa = df["Estimativa"]
+    EPT = df["Ept(%)"]
+    EPEST = df["Epest(%)"]
 
     # ============================================== SUBPLOTS ============================================== #
 
@@ -165,7 +184,7 @@ for x in valores_x:
 
     # estimativa
     axs[0].plot(contador, estimativa, "or", label="estimativa")
-    axs[0].axhline(y=u, linestyle="--", label="$e^{-x^2}$")
+    axs[0].axhline(y=u, linestyle="--", label="$\mathrm{e}^{-x^2}$")
     axs[0].set_title(f"Aproximação da Gaussiana (x = {x})")
     axs[0].set_xlabel("Número de termos")
     axs[0].set_ylabel("Estimativa")
@@ -173,11 +192,12 @@ for x in valores_x:
     axs[0].grid()
 
     # erros
-    axs[1].plot(contador, EPT, "og", label="$E_{pt}$")
-    axs[1].plot(contador, EPEST, "ob", label="$E_{pest}$")
+    axs[1].plot(contador, EPT, "og", label="$E_{\\text{pt}}$")
+    axs[1].plot(contador, EPEST, "ob", label="$E_{\\text{pest}}$")
     axs[1].set_title(f"Erros para x = {x}")
     axs[1].set_xlabel("Número de termos")
     axs[1].set_ylabel("Erro (%)")
+    axs[1].set_yscale("log")
     axs[1].legend()
     axs[1].grid()
 

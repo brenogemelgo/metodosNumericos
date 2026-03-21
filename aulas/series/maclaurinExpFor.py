@@ -53,9 +53,11 @@ plt.ylabel("Estimativa")
 plt.grid()
 
 plt.figure()
-plt.plot(contador, EPT, "og", label="$E_{pt}$")
-plt.plot(contador, EPEST, "ob", label="$E_{pest}$")
+plt.plot(contador, EPT, "og", label="$E_{\\text{pt}}$")
+plt.plot(contador, EPEST, "ob", label="$E_{\\text{pest}}$")
 plt.legend()
 plt.xlabel("Número de termos")
 plt.ylabel("Erros")
 plt.grid()
+
+plt.show()
