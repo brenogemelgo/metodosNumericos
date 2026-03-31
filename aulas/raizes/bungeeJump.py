@@ -7,28 +7,26 @@ def f(x):
     return np.sin(10 * x) + np.cos(3 * x)
 
 
-i = 3
-step = 0.01
-x = np.arange(3, 6, 0.01)
+n = 100
+x = np.linspace(3, 6, n)
+y = f(x)
 
 xb = []
-nb = 0
 
-while i <= 6:
-    xl = f(i)
-    i += step
-    xu = f(i)
+for i in range(n - 1):
+    xl = x[i]
+    xu = x[i + 1]
 
-    if (xl * xu) < 0:
-        nb += 1
+    if (f(xl) * f(xu)) < 0:
         xb.append([xl, xu])
 
-if len(xb) == 0:
+if not xb == 0:
     print("Nenhum subintervalo foi encontrado")
 
 print("xb = ", xb)
-print("Número de subintervalos = ", nb)
+print("Número de subintervalos = ", len(xb))
 
 plt.figure()
-plt.plot(x, f(x), "-b", label="quero me apaixonar pelo eu-lírico")
+plt.plot(x, y, "-b", label="f(x)")
+plt.axhline(0, linestyle="--")
 plt.show()
