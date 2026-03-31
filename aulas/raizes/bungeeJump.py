@@ -1,32 +1,39 @@
 import numpy as np
-import math
-import matplotlib.pyplot as plt
 
 
-def f(x):
-    return np.sin(10 * x) + np.cos(3 * x)
+def f(m):
+    return np.sqrt(9.81 * m / 0.25) * np.tanh(np.sqrt(9.81 * 0.25 / m) * 4) - 36
 
 
-n = 100
-x = np.linspace(3, 6, n)
-y = f(x)
+u = 142.7376
 
-xb = []
+Eppara = 0.5 * 10 ** (2 - 6)
+Ept = 100
+Epest = 100
 
-for i in range(n - 1):
-    xl = x[i]
-    xu = x[i + 1]
+xl = 140
+xu = 150
 
-    if (f(xl) * f(xu)) < 0:
-        xb.append([xl, xu])
+xr_old = 0
 
-if not xb == 0:
-    print("Nenhum subintervalo foi encontrado")
+k = 0
+while Epest >= Eppara:
 
-print("xb = ", xb)
-print("Número de subintervalos = ", len(xb))
+    # bisecção
+    # xr = (xl + xu) / 2
 
-plt.figure()
-plt.plot(x, y, "-b", label="f(x)")
-plt.axhline(0, linestyle="--")
-plt.show()
+    # falsa posição
+    xr = xu - f(xu) * (xl - xu) / (f(xl) - f(xu))
+
+    if (f(xl) * f(xr)) < 0:
+        xu = xr
+    else:
+        xl = xr
+
+    Ept = abs((u - xr) / u) * 100
+    Epest = abs((xr - xr_old) / xr)
+
+    xr_old = xr
+    k += 1
+
+print(xr)
