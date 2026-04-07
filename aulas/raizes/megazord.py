@@ -9,10 +9,55 @@ def f(x):
     return x**2 - 2
 
 
+def bisseccao(f, xl, xu, Eppara):
+    Epest = 100
+    xr_old = 0
+    k = 0
+
+    while Epest >= Eppara:
+        xr = (xl + xu) / 2
+
+        if (f(xl) * f(xr)) < 0:
+            xu = xr
+        else:
+            xl = xr
+
+        if k > 0:
+            Epest = abs((xr - xr_old) / xr) * 100
+
+        xr_old = xr
+        k += 1
+
+    return xr, k
+
+
+def falsa_posicao(f, xl, xu, Eppara):
+    Epest = 100
+    xr_old = 0
+    k = 0
+
+    while Epest >= Eppara:
+        xr = xu - f(xu) * (xl - xu) / (f(xl) - f(xu))
+
+        if (f(xl) * f(xr)) < 0:
+            xu = xr
+        else:
+            xl = xr
+
+        if k > 0:
+            Epest = abs((xr - xr_old) / xr) * 100
+
+        xr_old = xr
+        k += 1
+
+    return xr, k
+
+
 # =============================================================================== #
 
 # =============================================================================== #
 # MÉTODO GRÁFICO
+
 n = 1000
 x = np.linspace(-2, 2, n)
 plt.figure()
@@ -37,31 +82,33 @@ print(xb)
 # =============================================================================== #
 
 # =============================================================================== #
-# FALSA POSIÇÃO
+# BISSECÇÃO E FALSA POSIÇÃO
 
 Eppara = 0.5 * 10 ** (2 - 6)
-Epest = 100
-xr_old = 0
-k = 0
-while Epest >= Eppara:
 
-    # bisecção
-    # xr = (xl + xu) / 2
+print("\nBISSECÇÃO")
+for i in range(len(xb)):
+    xl = xb[i][0]
+    xu = xb[i][1]
 
-    xr = xu - f(xu) * (xl - xu) / (f(xl) - f(xu))
+    xr, k = bisseccao(f, xl, xu, Eppara)
 
-    if (f(xl) * f(xr)) < 0:
-        xu = xr
-    else:
-        xl = xr
+    print(f"Intervalo {i+1}: [{xl}, {xu}]")
+    print("Raiz encontrada =", xr)
+    print("Iterações =", k)
+    print()
 
-    Epest = abs((xr - xr_old) / xr)
+print("FALSA POSIÇÃO")
+for i in range(len(xb)):
+    xl = xb[i][0]
+    xu = xb[i][1]
 
-    xr_old = xr
-    k += 1
+    xr, k = falsa_posicao(f, xl, xu, Eppara)
 
-print("Raiz encontrada")
-print(xr)
+    print(f"Intervalo {i+1}: [{xl}, {xu}]")
+    print("Raiz encontrada =", xr)
+    print("Iterações =", k)
+    print()
 
 # =============================================================================== #
 

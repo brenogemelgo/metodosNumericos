@@ -19,7 +19,7 @@ xr_old = 0
 k = 0
 while Epest >= Eppara:
 
-    # bisecção
+    # bissecção
     # xr = (xl + xu) / 2
 
     # falsa posição
