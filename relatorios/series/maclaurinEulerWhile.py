@@ -94,7 +94,7 @@ n = 6
 
 # garante que a pasta existe
 base_dir = os.path.dirname(os.path.abspath(__file__))
-pasta_output = os.path.join(base_dir, "output", "series")
+pasta_output = os.path.join(base_dir, "output")
 os.makedirs(pasta_output, exist_ok=True)
 
 t0 = time.perf_counter()
