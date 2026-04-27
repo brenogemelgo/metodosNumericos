@@ -13,19 +13,19 @@ xl = 3
 xu = 6
 xr_old = (xl + xu) / 2
 
-k = 0
+i = 0
 
 while Epest >= Eppara:
     xr = xr_old - delta * xr_old * f(xr_old) / (f(xr_old + delta * xr_old) - f(xr_old))
 
-    if k > 0:
+    if i > 0:
         Epest = abs((xr - xr_old) / xr) * 100
 
     xr_old = xr
-    k += 1
+    i += 1
 
 
 print("Raiz aproximada = ", xr)
 print("f(xr) = ", f(xr))
 print("Erro estimado = ", Epest)
-print("Número de iterações = ", k)
+print("Número de iterações = ", i)
