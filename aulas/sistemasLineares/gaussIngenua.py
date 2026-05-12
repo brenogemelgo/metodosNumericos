@@ -1,12 +1,16 @@
 import numpy as np
 
+# primeiro exemplo
+A = np.array([[2, 4, -6], [4, 2, 2], [2, 8, -4]])
+b = np.array([[10], [16], [24]])
+
 # sistema guardado 1
 # A = np.array([[3, -0.1, -0.2], [0.1, 7, -0.3], [0.3, -0.2, 10]])
 # b = np.array([[7.85], [-19.3], [71.4]])
 
 # sistema guardado 2
-A = np.array([[0.0003, 3], [1, 1]])
-b = np.array([[2.0001], [1]])
+# A = np.array([[0.0003, 3], [1, 1]])
+# b = np.array([[2.0001], [1]])
 
 Aum = np.hstack((A, b))
 n = len(b)
